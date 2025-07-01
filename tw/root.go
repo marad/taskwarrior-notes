@@ -23,12 +23,7 @@ func GetTasks(filter []string) ([]Task, error) {
 	return tasks, nil
 }
 
-func GetTaskPaths(filter []string, notesRoot string) ([]string, error) {
-	tasks, err := GetTasks(filter)
-	if err != nil {
-		return nil, err
-	}
-
+func GetTaskPaths(tasks []Task, notesRoot string) ([]string, error) {
 	var paths []string
 	for _, task := range tasks {
 		path, err := GetTaskPath(&task, notesRoot)

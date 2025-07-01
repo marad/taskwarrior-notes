@@ -13,6 +13,7 @@ type Task struct {
 	Description string  `json:"description"`
 	Entry       string  `json:"entry"`
 	Modified    string  `json:"modified"`
+	End         string  `json:"end"`
 	Status      string  `json:"status"`
 	UUID        string  `json:"uuid"`
 	Urgency     float64 `json:"urgency"`
@@ -35,6 +36,13 @@ func (t *Task) EntryTime() (time.Time, error) {
 
 func (t *Task) ModifiedTime() (time.Time, error) {
 	return time.Parse(TW_TIME_FORMAT, t.Modified)
+}
+
+func (t *Task) EndTime() (time.Time, error) {
+	if t.End == "" {
+		return time.Time{}, nil // No end time set
+	}
+	return time.Parse(TW_TIME_FORMAT, t.End)
 }
 
 func TaskNotePath(t *Task, taskNoteRoot string) (string, error) {
