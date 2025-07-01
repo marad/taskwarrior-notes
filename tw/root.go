@@ -5,8 +5,9 @@ import (
 	"os/exec"
 )
 
-func GetTasks(filter string) ([]Task, error) {
-	cmd := exec.Command("task", "export", filter)
+func GetTasks(filter []string) ([]Task, error) {
+	args := append(filter, "export")
+	cmd := exec.Command("task", args...)
 	out, err := cmd.Output()
 	if err != nil {
 		return nil, err
