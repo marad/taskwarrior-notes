@@ -8,4 +8,4 @@ run:
 	go run .
 
 install: build
-	go install twn
+	cp twn $(shell go env GOPATH)/bin/
