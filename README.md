@@ -1,44 +1,40 @@
 # TaskWarrior Notes CLI
 
-TaskWarrior Notes CLI (`twn`) to narzędzie wiersza poleceń
-do zarządzania notatkami powiązanymi z zadaniami TaskWarrior.
-Pozwala synchronizować metadane zadań z notatkami,
-pobierać ścieżki do notatek
-oraz wykonywać inne operacje związane z notatkami zadań.
+TaskWarrior Notes CLI (`twn`) is a command-line tool for managing notes associated with TaskWarrior tasks. It allows you to synchronize task metadata with notes, retrieve note paths, and perform other note-related operations for tasks.
 
-## Instalacja
+## Installation
 
-Wymagania:
+Requirements:
 
 - Go 1.24+
 
-Aby zbudować i zainstalować narzędzie:
+To build and install the tool:
 
 ```sh
 make install
 ```
 
-Lub ręcznie:
+Or manually:
 
 ```sh
 go build -o twn .
 cp twn $(go env GOPATH)/bin/
 ```
 
-## Budowanie
+## Building
 
-Aby zbudować binarkę:
+To build the binary:
 
 ```sh
 make build
 ```
 
-Aby uruchomić bezpośrednio:
+To run directly:
 
 ```sh
 make run
 ```
 
-## Licencja
+## License
 
 MIT
