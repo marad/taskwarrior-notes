@@ -23,7 +23,9 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
+	"path"
 	"taskwarrior-notes/config"
 	"taskwarrior-notes/tw"
 	"taskwarrior-notes/util"
@@ -56,13 +58,18 @@ var syncCmd = &cobra.Command{
 }
 
 func syncTaskWithNote(task *tw.Task, notesRoot string) error {
-	path, err := tw.GetTaskPath(task, notesRoot)
+	notePath, err := tw.GetTaskPath(task, notesRoot)
 	if err != nil {
 		return fmt.Errorf("error getting task path: %w", err)
 	}
 
+	dir := path.Dir(notePath) // Ensure the directory exists
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("error ensuring directory exists: %w", err)
+	}
+
 	// Ustaw status w frontmatter
-	args := []string{"set", "status=" + task.Status}
+	args := []string{"set", "status=" + task.Status, "uuid=" + task.UUID}
 
 	// Ustaw lub usuń doneDate
 	if task.End != "" {
@@ -73,21 +80,21 @@ func syncTaskWithNote(task *tw.Task, notesRoot string) error {
 		}
 		doneDate := endTime.Format("2006-01-02")
 		args = append(args, "doneDate="+doneDate)
-		args = append(args, path)
+		args = append(args, notePath)
 		cmd := exec.Command("frontmatter", args...)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			return fmt.Errorf("frontmatter set error: %v, output: %s", err, string(output))
 		}
 	} else {
-		args = append(args, path)
+		args = append(args, notePath)
 		cmd := exec.Command("frontmatter", args...)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			return fmt.Errorf("frontmatter set error: %v, output: %s", err, string(output))
 		}
 
-		cmd = exec.Command("frontmatter", "delete", "doneDate", path)
+		cmd = exec.Command("frontmatter", "delete", "doneDate", notePath)
 		output, err = cmd.CombinedOutput()
 		if err != nil {
 			return fmt.Errorf("frontmatter delete error: %v, output: %s", err, string(output))
