@@ -9,3 +9,7 @@ run:
 
 install: build
 	cp twn $(shell go env GOPATH)/bin/
+
+install_hook:
+	mkdir -p ~/.task/hooks/
+	cp hooks/on-modify-sync-note.sh ~/.task/hooks/
