@@ -26,6 +26,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strings"
 	"taskwarrior-notes/config"
 	"taskwarrior-notes/tw"
 	"taskwarrior-notes/util"
@@ -69,7 +70,8 @@ func syncTaskWithNote(task *tw.Task, notesRoot string) error {
 	}
 
 	// Ustaw status w frontmatter
-	args := []string{"set", "status=" + task.Status, "uuid=" + task.UUID}
+	tags := []string{"task"}
+	args := []string{"set", "status=" + task.Status, "uuid=" + task.UUID, "tags=" + strings.Join(tags, ",")}
 
 	// Ustaw lub usuń doneDate
 	if task.End != "" {
