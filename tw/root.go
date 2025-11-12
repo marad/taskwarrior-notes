@@ -6,6 +6,9 @@ import (
 	"strings"
 )
 
+// NoteFinder abstracts locating an existing note by task UUID.
+type NoteFinder func(uuid, notesRoot string) (string, error)
+
 func GetTasks(filter []string) ([]Task, error) {
 	args := append(filter, "export")
 	cmd := exec.Command("task", args...)
@@ -23,36 +26,34 @@ func GetTasks(filter []string) ([]Task, error) {
 	return tasks, nil
 }
 
-func GetTaskPaths(tasks []Task, notesRoot string) ([]string, error) {
+func GetTaskPathsWithFinder(tasks []Task, notesRoot string, finder NoteFinder) ([]string, error) {
 	var paths []string
 	for _, task := range tasks {
-		path, err := GetTaskPath(&task, notesRoot)
+		p, err := GetTaskPathWithFinder(&task, notesRoot, finder)
 		if err != nil {
 			return nil, err
 		}
-		paths = append(paths, path)
+		paths = append(paths, p)
 	}
-
 	return paths, nil
 }
 
-func GetTaskPath(task *Task, notesRoot string) (string, error) {
+func GetTaskPaths(tasks []Task, notesRoot string) ([]string, error) {
+	return GetTaskPathsWithFinder(tasks, notesRoot, FindNoteByUUID)
+}
 
-	// Try to find existing note by UUID first (in case it's name was changed)
-	path, err := FindNoteByUUID(task.UUID, notesRoot)
+func GetTaskPathWithFinder(task *Task, notesRoot string, finder NoteFinder) (string, error) {
+	path, err := finder(task.UUID, notesRoot)
 	if err != nil {
 		return "", err
 	} else if path != "" {
 		return path, nil
 	}
+	return TaskNotePath(task, notesRoot)
+}
 
-	// If no note found by UUID, generate path based on task details
-	path, err = TaskNotePath(task, notesRoot)
-	if err != nil {
-		return "", err
-	}
-
-	return path, nil
+func GetTaskPath(task *Task, notesRoot string) (string, error) {
+	return GetTaskPathWithFinder(task, notesRoot, FindNoteByUUID)
 }
 
 func FindNoteByUUID(uuid string, notesRoot string) (string, error) {
@@ -72,3 +73,4 @@ func FindNoteByUUID(uuid string, notesRoot string) (string, error) {
 
 	return strings.Trim(string(out), "\n\t "), nil
 }
+
